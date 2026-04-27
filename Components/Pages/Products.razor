@@ -1,0 +1,44 @@
+@page "/products"
+@rendermode InteractiveServer
+@inject IProductService ProductService
+@using CursedShop.Models
+@using CursedShop.Interfaces
+
+<h1>Cursed Shop</h1>
+
+<h3>Dodaj produkt</h3>
+<input @bind="newProduct.Name" placeholder="Nazwa" />
+<input @bind="newProduct.BasePrice" placeholder="Cena" type="number">
+<button @onclick="Add">Dodaj</button>
+
+<h3>Lista produktów</h3>
+@if (products is null){
+    <p>Ładowanie...</p>
+}
+else
+{
+    <ul>
+        @foreach (var product in products)
+        {
+            <li>@product.Name - @product.BasePrice zł</li>
+        }
+    </ul>
+}
+
+@code
+{
+    private List<Product>? products;
+    private Product newProduct = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllAsync();
+    }
+
+    private async Task Add()
+    {
+        await ProductService.AddAsync(newProduct);
+        newProduct = new();
+        products = await ProductService.GetAllAsync();
+    }
+}
